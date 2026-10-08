@@ -44,7 +44,7 @@ const INITIAL_VILLAGERS: Villager[] = [
     memories: [
       { day: 1, type: 'blessing', description: 'Felt the gentle radiant warmth of the divine sun.', sentiment: 'positive' }
     ],
-    color: '#38bdf8'
+    color: '#0284c7'
   },
   {
     id: 'v2',
@@ -60,7 +60,7 @@ const INITIAL_VILLAGERS: Villager[] = [
     memories: [
       { day: 1, type: 'blessing', description: 'Watched the clouds part after the morning harvest.', sentiment: 'positive' }
     ],
-    color: '#4ade80'
+    color: '#16a34a'
   },
   {
     id: 'v3',
@@ -76,7 +76,7 @@ const INITIAL_VILLAGERS: Villager[] = [
     memories: [
       { day: 1, type: 'drought', description: 'Had to queue by the freshwater stone well.', sentiment: 'neutral' }
     ],
-    color: '#f97316'
+    color: '#ea580c'
   },
   {
     id: 'v4',
@@ -92,7 +92,7 @@ const INITIAL_VILLAGERS: Villager[] = [
     memories: [
       { day: 1, type: 'miracle', description: 'Saw the giant hands shape the clouds.', sentiment: 'positive' }
     ],
-    color: '#e879f9'
+    color: '#c026d3'
   },
   {
     id: 'v5',
@@ -108,7 +108,7 @@ const INITIAL_VILLAGERS: Villager[] = [
     memories: [
       { day: 1, type: 'storm', description: 'Startled by whistling sea gales.', sentiment: 'negative' }
     ],
-    color: '#fbbf24'
+    color: '#d97706'
   },
   {
     id: 'v6',
@@ -124,7 +124,7 @@ const INITIAL_VILLAGERS: Villager[] = [
     memories: [
       { day: 1, type: 'prayer_answered', description: 'Heard the whisper of the tabletop winds.', sentiment: 'positive' }
     ],
-    color: '#a78bfa'
+    color: '#7c3aed'
   },
   {
     id: 'v7',
@@ -140,7 +140,7 @@ const INITIAL_VILLAGERS: Villager[] = [
     memories: [
       { day: 1, type: 'blessing', description: 'Planted wheat under sunny skies.', sentiment: 'positive' }
     ],
-    color: '#34d399'
+    color: '#059669'
   },
   {
     id: 'v8',
@@ -156,7 +156,7 @@ const INITIAL_VILLAGERS: Villager[] = [
     memories: [
       { day: 1, type: 'blessing', description: 'Watched the shoreline waves glisten.', sentiment: 'positive' }
     ],
-    color: '#f43f5e'
+    color: '#e11d48'
   }
 ];
 
@@ -167,7 +167,7 @@ export default function App() {
 
   const [islandState, setIslandState] = useState<IslandState>({
     day: 1,
-    timeOfDay: 0.35, // morning-afternoon
+    timeOfDay: 0.35,
     weather: 'calm',
     temperature: 22,
     soilMoisture: 60,
@@ -188,11 +188,9 @@ export default function App() {
 
     const timer = setInterval(() => {
       setIslandState(prev => {
-        // Advance time of day slowly (representing 5-8 min session)
         const nextTime = (prev.timeOfDay + 0.002) % 1;
         const nextDay = prev.timeOfDay > 0.99 ? prev.day + 1 : prev.day;
 
-        // Weather impacts on soil and temperature
         let nextTemp = prev.temperature;
         let nextMoisture = prev.soilMoisture;
         let nextWater = prev.waterReservoir;
@@ -207,7 +205,6 @@ export default function App() {
         } else if (prev.weather === 'windy') {
           nextTemp = Math.max(14, nextTemp - 0.3);
         } else {
-          // calm
           nextTemp = nextTemp > 22 ? nextTemp - 0.1 : nextTemp + 0.1;
         }
 
@@ -221,10 +218,9 @@ export default function App() {
         };
       });
 
-      // Villagers need decay and utility decisions
       setVillagers(prevList =>
         prevList.map(v => {
-          if (v.heldHeight > 0) return v; // suspended in air
+          if (v.heldHeight > 0) return v;
 
           const newNeeds = { ...v.needs };
           newNeeds.food = Math.max(0, newNeeds.food - 0.15);
@@ -239,7 +235,6 @@ export default function App() {
             newNeeds.warmth = Math.max(15, newNeeds.warmth - 0.1);
           }
 
-          // Local Utility Action Selection
           let nextAction = v.currentAction;
           if (newNeeds.water < 35 && islandState.waterReservoir > 15) {
             nextAction = 'drinking';
@@ -280,7 +275,7 @@ export default function App() {
       addMemoryToAll('blessing', 'Blessed by warm golden sunlight from the rubbing hands.', 'positive');
     } else if (gesture === 'flick_down') {
       setIslandState(prev => ({ ...prev, weather: 'rainy', activeGesture: gesture }));
-      addMemoryToAll('blessing', 'Sweet rain showers showered the village from the flicking sky.', 'positive');
+      addMemoryToAll('blessing', 'Sweet rain showers watered the village from the flicking sky.', 'positive');
     } else if (gesture === 'sweep_flat') {
       setIslandState(prev => ({ ...prev, weather: 'windy', activeGesture: gesture }));
       addMemoryToAll('storm', 'A sweeping divine hand summoned whistling offshore gales.', 'neutral');
@@ -349,8 +344,8 @@ export default function App() {
 
   const handleBlessVillager = (villagerId: string) => {
     confetti({
-      particleCount: 40,
-      spread: 60,
+      particleCount: 35,
+      spread: 55,
       origin: { y: 0.7 }
     });
 
@@ -403,35 +398,35 @@ export default function App() {
   };
 
   return (
-    <div className="flex flex-col h-screen w-screen bg-slate-950 text-slate-100 overflow-hidden font-sans">
-      {/* Top Header & Session Bar */}
-      <header className="h-14 border-b border-slate-800 bg-slate-900/90 backdrop-blur-md px-4 flex items-center justify-between flex-shrink-0 z-20">
+    <div className="flex flex-col h-screen w-screen bg-neutral-50 text-neutral-900 overflow-hidden font-sans">
+      {/* Top Header & Session Bar (Clean white background, human-crafted design) */}
+      <header className="h-14 border-b border-neutral-200 bg-white px-4 md:px-6 flex items-center justify-between flex-shrink-0 z-20 shadow-xs">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-600 to-cyan-500 flex items-center justify-center shadow-md">
-            <span className="text-base">🏝️</span>
+          <div className="w-8 h-8 rounded-lg bg-amber-700 text-white flex items-center justify-center font-bold text-sm shadow-xs">
+            🏝️
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-sm font-bold tracking-tight text-white uppercase">
-                TABLETOP WEATHER GOD
+              <h1 className="text-sm font-semibold tracking-tight text-neutral-900">
+                Tabletop Weather God
               </h1>
-              <span className="px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-                Meta Quest &bull; OpenXR &bull; Hands Only
+              <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-neutral-100 text-neutral-600 border border-neutral-200">
+                Meta Quest &bull; Hands Only
               </span>
             </div>
-            <p className="text-[11px] text-slate-400">
-              XR Dev Studio &amp; Architecture Workbench (Meta VR Start 2026)
+            <p className="text-[11px] text-neutral-500 hidden sm:block">
+              Unity 6 XR Developer Workbench &bull; Meta VR Start 2026
             </p>
           </div>
         </div>
 
         {/* In-Game Session Tracker */}
-        <div className="hidden md:flex items-center gap-4 bg-slate-950/70 px-3 py-1.5 rounded-lg border border-slate-800/80 text-xs">
-          <div className="flex items-center gap-1.5 text-slate-300">
-            <Clock className="w-3.5 h-3.5 text-cyan-400" />
-            <span>Day {islandState.day}</span>
-            <span className="text-slate-600">&bull;</span>
-            <span className="font-mono text-slate-400">
+        <div className="hidden md:flex items-center gap-4 bg-neutral-100/80 px-3.5 py-1.5 rounded-lg border border-neutral-200 text-xs">
+          <div className="flex items-center gap-1.5 text-neutral-700">
+            <Clock className="w-3.5 h-3.5 text-neutral-500" />
+            <span className="font-medium">Day {islandState.day}</span>
+            <span className="text-neutral-400">&bull;</span>
+            <span className="text-neutral-600">
               {islandState.timeOfDay < 0.25
                 ? 'Dawn'
                 : islandState.timeOfDay < 0.7
@@ -442,38 +437,38 @@ export default function App() {
             </span>
           </div>
 
-          <div className="w-px h-3.5 bg-slate-800" />
+          <div className="w-px h-3.5 bg-neutral-300" />
 
           <div className="flex items-center gap-1.5">
-            <span className="text-slate-400">Weather:</span>
-            <span className="capitalize font-semibold text-amber-300 flex items-center gap-1">
-              {islandState.weather === 'sunny' && <Sun className="w-3 h-3" />}
-              {islandState.weather === 'rainy' && <CloudRain className="w-3 h-3" />}
-              {islandState.weather === 'windy' && <Wind className="w-3 h-3" />}
-              {islandState.weather === 'calm' && <Waves className="w-3 h-3" />}
+            <span className="text-neutral-500">Weather:</span>
+            <span className="capitalize font-semibold text-neutral-800 flex items-center gap-1">
+              {islandState.weather === 'sunny' && <Sun className="w-3.5 h-3.5 text-amber-500" />}
+              {islandState.weather === 'rainy' && <CloudRain className="w-3.5 h-3.5 text-sky-500" />}
+              {islandState.weather === 'windy' && <Wind className="w-3.5 h-3.5 text-teal-600" />}
+              {islandState.weather === 'calm' && <Waves className="w-3.5 h-3.5 text-emerald-600" />}
               {islandState.weather}
             </span>
           </div>
 
-          <div className="w-px h-3.5 bg-slate-800" />
+          <div className="w-px h-3.5 bg-neutral-300" />
 
           <button
             onClick={() => setIsSimulating(!isSimulating)}
-            className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-slate-200 transition-colors"
+            className="flex items-center gap-1 text-[11px] font-medium text-neutral-600 hover:text-neutral-900 transition-colors"
           >
-            {isSimulating ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
-            <span>{isSimulating ? 'Pause Sim' : 'Resume Sim'}</span>
+            {isSimulating ? <Pause className="w-3 h-3 text-neutral-500" /> : <Play className="w-3 h-3 text-neutral-500" />}
+            <span>{isSimulating ? 'Pause' : 'Resume'}</span>
           </button>
         </div>
 
-        {/* Navigation Tabs */}
-        <div className="flex items-center gap-1 bg-slate-950/80 p-1 rounded-lg border border-slate-800">
+        {/* Navigation Tabs (Clean human-crafted pill buttons) */}
+        <div className="flex items-center gap-1 bg-neutral-100 p-1 rounded-lg border border-neutral-200">
           {[
-            { id: 'setup', label: '1. Setup & Verifier', icon: ShieldCheck },
-            { id: 'prototype', label: '2. 3D Prototype', icon: Gamepad2 },
-            { id: 'villagers', label: '3. Villager AI', icon: Users },
-            { id: 'architecture', label: '4. C# Architecture', icon: FolderTree },
-            { id: 'save', label: '5. JSON Save & Chronicle', icon: Database }
+            { id: 'setup', label: 'Setup Verifier', icon: ShieldCheck },
+            { id: 'prototype', label: '3D Prototype', icon: Gamepad2 },
+            { id: 'villagers', label: 'Villager AI', icon: Users },
+            { id: 'architecture', label: 'C# Code', icon: FolderTree },
+            { id: 'save', label: 'JSON Save', icon: Database }
           ].map(tab => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -483,11 +478,11 @@ export default function App() {
                 onClick={() => setActiveTab(tab.id as any)}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
                   isActive
-                    ? 'bg-indigo-600 text-white shadow-sm'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                    ? 'bg-white text-neutral-900 shadow-xs border border-neutral-200'
+                    : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-200/60'
                 }`}
               >
-                <Icon className="w-3.5 h-3.5" />
+                <Icon className="w-3.5 h-3.5 text-neutral-500" />
                 <span className="hidden sm:inline">{tab.label}</span>
               </button>
             );
@@ -495,8 +490,8 @@ export default function App() {
         </div>
       </header>
 
-      {/* Main Content Workspace */}
-      <main className="flex-1 overflow-hidden p-3 md:p-4">
+      {/* Main Content Workspace (Clean white cards, natural neutral styling) */}
+      <main className="flex-1 overflow-hidden p-3 md:p-5 bg-neutral-50">
         {activeTab === 'setup' && (
           <div className="h-full flex flex-col">
             <ProjectSetupVerifier />
@@ -523,15 +518,17 @@ export default function App() {
               </div>
 
               {/* Side Villager Quick Peek */}
-              <div className="h-full bg-slate-900/60 border border-slate-800 rounded-xl p-3 overflow-hidden flex flex-col">
-                <div className="flex items-center justify-between pb-2 border-b border-slate-800 mb-2">
+              <div className="h-full bg-white border border-neutral-200 rounded-xl p-3.5 overflow-hidden flex flex-col shadow-xs">
+                <div className="flex items-center justify-between pb-2.5 border-b border-neutral-100 mb-2.5">
                   <div className="flex items-center gap-2">
-                    <Users className="w-4 h-4 text-cyan-400" />
-                    <span className="text-xs font-semibold text-slate-200">
-                      Live Villager Focus ({villagers.length} Citizens)
+                    <Users className="w-4 h-4 text-neutral-600" />
+                    <span className="text-xs font-semibold text-neutral-800">
+                      Live Villagers ({villagers.length} Citizens)
                     </span>
                   </div>
-                  <span className="text-[10px] font-mono text-emerald-400">Local Utility AI</span>
+                  <span className="text-[10px] font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                    On-Device Utility AI
+                  </span>
                 </div>
                 <div className="flex-1 overflow-hidden">
                   <VillagerInspector
@@ -558,7 +555,7 @@ export default function App() {
         )}
 
         {activeTab === 'villagers' && (
-          <div className="h-full">
+          <div className="h-full bg-white border border-neutral-200 rounded-xl p-4 shadow-xs">
             <VillagerInspector
               villagers={villagers}
               selectedVillagerId={selectedVillagerId}

@@ -39,9 +39,9 @@ export const TabletopCanvas: React.FC<TabletopCanvasProps> = ({
     const container = mountRef.current;
     if (!container) return;
 
-    // 1. Scene setup
+    // 1. Scene setup with clean studio warm gray/white background
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x10141d);
+    scene.background = new THREE.Color(0xf1f5f9);
     sceneRef.current = scene;
 
     // 2. Camera setup - seated VR perspective looking down at a tabletop
@@ -59,23 +59,23 @@ export const TabletopCanvas: React.FC<TabletopCanvasProps> = ({
     container.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
-    // 4. Seated Tabletop Base (The wooden table in VR)
+    // 4. Seated Tabletop Base (Natural rich warm timber tabletop)
     const tableGeo = new THREE.CylinderGeometry(3.6, 3.8, 0.35, 32);
     const tableMat = new THREE.MeshStandardMaterial({
-      color: 0x3d271d,
-      roughness: 0.7,
-      metalness: 0.1
+      color: 0x5c3d2e, // natural warm teak wood
+      roughness: 0.6,
+      metalness: 0.05
     });
     const tableMesh = new THREE.Mesh(tableGeo, tableMat);
     tableMesh.position.y = -0.18;
     tableMesh.receiveShadow = true;
     scene.add(tableMesh);
 
-    // Felt table mat / play area boundary
+    // Felt table mat / play area boundary (linen off-white/warm neutral)
     const matGeo = new THREE.CylinderGeometry(3.2, 3.2, 0.02, 32);
     const matMat = new THREE.MeshStandardMaterial({
-      color: 0x1f2937,
-      roughness: 0.8
+      color: 0xe2e8f0,
+      roughness: 0.9
     });
     const feltMat = new THREE.Mesh(matGeo, matMat);
     feltMat.position.y = 0.01;
@@ -85,11 +85,11 @@ export const TabletopCanvas: React.FC<TabletopCanvasProps> = ({
     // Ocean water basin
     const oceanGeo = new THREE.CylinderGeometry(2.8, 2.8, 0.08, 48);
     const oceanMat = new THREE.MeshStandardMaterial({
-      color: 0x0284c7,
+      color: 0x38bdf8,
       roughness: 0.15,
-      metalness: 0.4,
+      metalness: 0.3,
       transparent: true,
-      opacity: 0.85
+      opacity: 0.88
     });
     const oceanMesh = new THREE.Mesh(oceanGeo, oceanMat);
     oceanMesh.position.y = 0.05;
@@ -102,7 +102,7 @@ export const TabletopCanvas: React.FC<TabletopCanvasProps> = ({
     // Island main landmass
     const landGeo = new THREE.CylinderGeometry(2.1, 2.3, 0.28, 24);
     const landMat = new THREE.MeshStandardMaterial({
-      color: 0x15803d, // lush green
+      color: 0x16a34a, // lush natural green
       roughness: 0.8
     });
     const landMesh = new THREE.Mesh(landGeo, landMat);
@@ -113,7 +113,7 @@ export const TabletopCanvas: React.FC<TabletopCanvasProps> = ({
     // Sandy Shore rim
     const shoreGeo = new THREE.CylinderGeometry(2.35, 2.5, 0.15, 28);
     const shoreMat = new THREE.MeshStandardMaterial({
-      color: 0xd97706, // golden sand
+      color: 0xf59e0b, // warm sand
       roughness: 0.9
     });
     const shoreMesh = new THREE.Mesh(shoreGeo, shoreMat);
@@ -124,7 +124,7 @@ export const TabletopCanvas: React.FC<TabletopCanvasProps> = ({
     // Highland central hill
     const hillGeo = new THREE.ConeGeometry(1.1, 0.6, 16);
     const hillMat = new THREE.MeshStandardMaterial({
-      color: 0x166534,
+      color: 0x15803d,
       roughness: 0.9
     });
     const hillMesh = new THREE.Mesh(hillGeo, hillMat);
@@ -136,7 +136,7 @@ export const TabletopCanvas: React.FC<TabletopCanvasProps> = ({
     // 6. Island Landmark Props
     // Central Campfire
     const fireBaseGeo = new THREE.CylinderGeometry(0.2, 0.25, 0.08, 12);
-    const fireBaseMat = new THREE.MeshStandardMaterial({ color: 0x57534e });
+    const fireBaseMat = new THREE.MeshStandardMaterial({ color: 0x78716c });
     const fireBase = new THREE.Mesh(fireBaseGeo, fireBaseMat);
     fireBase.position.set(0.1, 0.38, 0.1);
     islandGroup.add(fireBase);
@@ -154,21 +154,21 @@ export const TabletopCanvas: React.FC<TabletopCanvasProps> = ({
     shrine.castShadow = true;
     islandGroup.add(shrine);
 
-    const shrineGlow = new THREE.PointLight(0x38bdf8, 1.2, 2.0);
+    const shrineGlow = new THREE.PointLight(0x0ea5e9, 1.2, 2.0);
     shrineGlow.position.set(-0.2, 0.8, -1.2);
     scene.add(shrineGlow);
     shrineGlowRef.current = shrineGlow;
 
     // Freshwater Well (East side)
     const wellGeo = new THREE.CylinderGeometry(0.18, 0.2, 0.2, 12);
-    const wellMat = new THREE.MeshStandardMaterial({ color: 0x78716c });
+    const wellMat = new THREE.MeshStandardMaterial({ color: 0x64748b });
     const well = new THREE.Mesh(wellGeo, wellMat);
     well.position.set(1.1, 0.42, -0.3);
     islandGroup.add(well);
 
     // Farmland Wheat Patch (South-West side)
     const farmGeo = new THREE.BoxGeometry(0.7, 0.05, 0.6);
-    const farmMat = new THREE.MeshStandardMaterial({ color: 0x78350f, roughness: 1.0 });
+    const farmMat = new THREE.MeshStandardMaterial({ color: 0x854d0e, roughness: 1.0 });
     const farm = new THREE.Mesh(farmGeo, farmMat);
     farm.position.set(-1.0, 0.36, 0.6);
     islandGroup.add(farm);
@@ -197,12 +197,11 @@ export const TabletopCanvas: React.FC<TabletopCanvasProps> = ({
       palm.position.set(px, py, pz);
 
       const trunkGeo = new THREE.CylinderGeometry(0.04, 0.06, 0.6, 6);
-      const trunkMat = new THREE.MeshStandardMaterial({ color: 0x713f12 });
+      const trunkMat = new THREE.MeshStandardMaterial({ color: 0x78350f });
       const trunk = new THREE.Mesh(trunkGeo, trunkMat);
       trunk.position.y = 0.3;
       palm.add(trunk);
 
-      // Fronds
       for (let i = 0; i < 5; i++) {
         const angle = (i / 5) * Math.PI * 2;
         const frondGeo = new THREE.BoxGeometry(0.3, 0.03, 0.1);
@@ -218,12 +217,12 @@ export const TabletopCanvas: React.FC<TabletopCanvasProps> = ({
     });
     palmGroupRef.current = palms;
 
-    // 7. Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    // 7. Natural Daylight Studio Lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
     scene.add(ambientLight);
     ambientLightRef.current = ambientLight;
 
-    const sunLight = new THREE.DirectionalLight(0xfffbeb, 1.4);
+    const sunLight = new THREE.DirectionalLight(0xfffbeb, 1.5);
     sunLight.position.set(4, 7, 3);
     sunLight.castShadow = true;
     sunLight.shadow.mapSize.width = 1024;
@@ -232,7 +231,6 @@ export const TabletopCanvas: React.FC<TabletopCanvasProps> = ({
     sunLightRef.current = sunLight;
 
     // 8. Particle Systems (Rain & Wind)
-    // Rain Particles
     const rainCount = 600;
     const rainGeo = new THREE.BufferGeometry();
     const rainPositions = new Float32Array(rainCount * 3);
@@ -243,7 +241,7 @@ export const TabletopCanvas: React.FC<TabletopCanvasProps> = ({
     }
     rainGeo.setAttribute('position', new THREE.BufferAttribute(rainPositions, 3));
     const rainMat = new THREE.PointsMaterial({
-      color: 0x7dd3fc,
+      color: 0x0284c7,
       size: 0.035,
       transparent: true,
       opacity: 0.8
@@ -253,7 +251,6 @@ export const TabletopCanvas: React.FC<TabletopCanvasProps> = ({
     scene.add(rainParticles);
     rainParticlesRef.current = rainParticles;
 
-    // Wind Swirl Particles
     const windCount = 200;
     const windGeo = new THREE.BufferGeometry();
     const windPositions = new Float32Array(windCount * 3);
@@ -264,10 +261,10 @@ export const TabletopCanvas: React.FC<TabletopCanvasProps> = ({
     }
     windGeo.setAttribute('position', new THREE.BufferAttribute(windPositions, 3));
     const windMat = new THREE.PointsMaterial({
-      color: 0xe0f2fe,
+      color: 0x64748b,
       size: 0.045,
       transparent: true,
-      opacity: 0.7
+      opacity: 0.6
     });
     const windParticles = new THREE.Points(windGeo, windMat);
     windParticles.visible = false;
@@ -288,7 +285,6 @@ export const TabletopCanvas: React.FC<TabletopCanvasProps> = ({
 
       const intersects = raycasterRef.current.intersectObjects(interactiveObjects, true);
       if (intersects.length > 0) {
-        // Find which villager was clicked
         let obj: THREE.Object3D | null = intersects[0].object;
         while (obj && !obj.userData?.villagerId && obj.parent) {
           obj = obj.parent;
@@ -312,17 +308,14 @@ export const TabletopCanvas: React.FC<TabletopCanvasProps> = ({
       const delta = clock.getDelta();
       const time = clock.getElapsedTime();
 
-      // Animate Campfire flicker
       if (campfireGlowRef.current) {
         campfireGlowRef.current.intensity = 1.5 + Math.sin(time * 12) * 0.3;
       }
 
-      // Animate Shrine gentle pulse
       if (shrineGlowRef.current) {
         shrineGlowRef.current.intensity = 1.0 + Math.sin(time * 2) * 0.4;
       }
 
-      // Animate Rain
       if (rainParticlesRef.current && rainParticlesRef.current.visible) {
         const positions = rainParticlesRef.current.geometry.attributes.position.array as Float32Array;
         for (let i = 1; i < positions.length; i += 3) {
@@ -334,7 +327,6 @@ export const TabletopCanvas: React.FC<TabletopCanvasProps> = ({
         rainParticlesRef.current.geometry.attributes.position.needsUpdate = true;
       }
 
-      // Animate Wind
       if (windParticlesRef.current && windParticlesRef.current.visible) {
         const positions = windParticlesRef.current.geometry.attributes.position.array as Float32Array;
         for (let i = 0; i < positions.length; i += 3) {
@@ -347,13 +339,11 @@ export const TabletopCanvas: React.FC<TabletopCanvasProps> = ({
         windParticlesRef.current.geometry.attributes.position.needsUpdate = true;
       }
 
-      // Palm swaying in wind
       palmGroupRef.current.forEach((palm, idx) => {
         const windIntensity = weather === 'windy' ? 0.25 : 0.05;
         palm.rotation.z = Math.sin(time * 2 + idx) * windIntensity;
       });
 
-      // Gentle tabletop rotation drift or camera idle
       renderer.render(scene, camera);
     };
 
@@ -388,28 +378,27 @@ export const TabletopCanvas: React.FC<TabletopCanvasProps> = ({
     if (weather === 'rainy') {
       rainParticlesRef.current.visible = true;
       windParticlesRef.current.visible = false;
-      sunLightRef.current.intensity = 0.5;
+      sunLightRef.current.intensity = 0.8;
       sunLightRef.current.color.setHex(0x94a3b8);
-      ambientLightRef.current.intensity = 0.35;
+      ambientLightRef.current.intensity = 0.55;
     } else if (weather === 'windy') {
       rainParticlesRef.current.visible = false;
       windParticlesRef.current.visible = true;
-      sunLightRef.current.intensity = 0.9;
+      sunLightRef.current.intensity = 1.1;
       sunLightRef.current.color.setHex(0xcfd8dc);
-      ambientLightRef.current.intensity = 0.45;
+      ambientLightRef.current.intensity = 0.65;
     } else if (weather === 'sunny') {
       rainParticlesRef.current.visible = false;
       windParticlesRef.current.visible = false;
       sunLightRef.current.intensity = 1.9;
       sunLightRef.current.color.setHex(0xfef08a);
-      ambientLightRef.current.intensity = 0.65;
+      ambientLightRef.current.intensity = 0.85;
     } else {
-      // calm
       rainParticlesRef.current.visible = false;
       windParticlesRef.current.visible = false;
-      sunLightRef.current.intensity = 1.2;
+      sunLightRef.current.intensity = 1.4;
       sunLightRef.current.color.setHex(0xfffbeb);
-      ambientLightRef.current.intensity = 0.5;
+      ambientLightRef.current.intensity = 0.75;
     }
   }, [weather]);
 
@@ -421,7 +410,6 @@ export const TabletopCanvas: React.FC<TabletopCanvasProps> = ({
     const currentMap = villagerMeshesRef.current;
     const existingIds = new Set(villagers.map(v => v.id));
 
-    // Remove old villagers
     currentMap.forEach((meshGroup, id) => {
       if (!existingIds.has(id)) {
         scene.remove(meshGroup);
@@ -429,7 +417,6 @@ export const TabletopCanvas: React.FC<TabletopCanvasProps> = ({
       }
     });
 
-    // Create or update each villager
     villagers.forEach(villager => {
       let group = currentMap.get(villager.id);
 
@@ -437,7 +424,6 @@ export const TabletopCanvas: React.FC<TabletopCanvasProps> = ({
         group = new THREE.Group();
         group.userData = { villagerId: villager.id };
 
-        // Cute low-poly villager body
         const bodyGeo = new THREE.CapsuleGeometry(0.08, 0.16, 6, 8);
         const bodyMat = new THREE.MeshStandardMaterial({
           color: new THREE.Color(villager.color),
@@ -448,25 +434,22 @@ export const TabletopCanvas: React.FC<TabletopCanvasProps> = ({
         body.castShadow = true;
         group.add(body);
 
-        // Villager head
         const headGeo = new THREE.SphereGeometry(0.075, 8, 8);
         const headMat = new THREE.MeshStandardMaterial({ color: 0xfde047, roughness: 0.7 });
         const head = new THREE.Mesh(headGeo, headMat);
         head.position.y = 0.32;
         group.add(head);
 
-        // Little conical straw hat
         const hatGeo = new THREE.ConeGeometry(0.11, 0.08, 8);
         const hatMat = new THREE.MeshStandardMaterial({ color: 0xb45309 });
         const hat = new THREE.Mesh(hatGeo, hatMat);
         hat.position.y = 0.4;
         group.add(hat);
 
-        // Selection / divine blessing aura ring
         const ringGeo = new THREE.RingGeometry(0.14, 0.17, 16);
         ringGeo.rotateX(-Math.PI / 2);
         const ringMat = new THREE.MeshBasicMaterial({
-          color: 0x38bdf8,
+          color: 0x0284c7,
           side: THREE.DoubleSide,
           transparent: true,
           opacity: 0.8
@@ -481,18 +464,15 @@ export const TabletopCanvas: React.FC<TabletopCanvasProps> = ({
         currentMap.set(villager.id, group);
       }
 
-      // Position update
       const targetY = villager.heldHeight > 0 ? 0.35 + villager.heldHeight : 0.35;
       group.position.set(villager.x, targetY, villager.z);
 
-      // Highlight selected/lifted villager
       const isSelected = selectedVillagerId === villager.id || villager.isInspected;
       const ring = group.getObjectByName('selectionRing');
       if (ring) {
         ring.visible = isSelected;
       }
 
-      // If lifted, add gentle hover bobbing
       if (villager.heldHeight > 0) {
         group.position.y += Math.sin(Date.now() * 0.005) * 0.03;
       }
@@ -500,37 +480,37 @@ export const TabletopCanvas: React.FC<TabletopCanvasProps> = ({
   }, [villagers, selectedVillagerId]);
 
   return (
-    <div className="relative w-full h-full select-none overflow-hidden rounded-xl border border-slate-700/60 bg-slate-950">
+    <div className="relative w-full h-full select-none overflow-hidden rounded-xl border border-neutral-200 bg-neutral-100 shadow-xs">
       <div ref={mountRef} className="w-full h-full cursor-grab active:cursor-grabbing" />
 
-      {/* Floating HUD over the Tabletop View */}
+      {/* Floating HUD over the Tabletop View - Clean white human-crafted cards */}
       <div className="absolute top-3 left-3 flex flex-wrap items-center gap-2 pointer-events-none">
-        <div className="px-3 py-1.5 rounded-lg bg-slate-900/85 backdrop-blur-md border border-slate-700/80 text-xs text-slate-200 flex items-center gap-2 shadow-lg">
-          <span className="w-2.5 h-2.5 rounded-full animate-pulse bg-emerald-400" />
-          <span className="font-semibold text-slate-100">Tabletop Diorama</span>
-          <span className="text-slate-400">|</span>
-          <span className="capitalize text-amber-300 font-mono font-medium">{weather} Sky</span>
-          <span className="text-slate-400">|</span>
-          <span className="font-mono text-cyan-300">{temperature}°C</span>
+        <div className="px-3 py-1.5 rounded-lg bg-white/95 backdrop-blur-md border border-neutral-200 text-xs text-neutral-800 flex items-center gap-2 shadow-xs">
+          <span className="w-2 h-2 rounded-full bg-emerald-500" />
+          <span className="font-semibold text-neutral-900">Tabletop Diorama</span>
+          <span className="text-neutral-300">|</span>
+          <span className="capitalize text-neutral-700 font-medium">{weather} Sky</span>
+          <span className="text-neutral-300">|</span>
+          <span className="font-mono text-neutral-600">{temperature}°C</span>
         </div>
 
         {activeGesture && (
-          <div className="px-3 py-1.5 rounded-lg bg-indigo-900/90 backdrop-blur-md border border-indigo-500/70 text-xs text-indigo-100 flex items-center gap-2 shadow-lg animate-bounce">
-            <span className="text-sm">✨</span>
-            <span className="font-bold tracking-wide uppercase">
-              Gesture Active: {activeGesture.replace('_', ' ')}
+          <div className="px-3 py-1.5 rounded-lg bg-neutral-900 text-white border border-neutral-800 text-xs flex items-center gap-2 shadow-md">
+            <span>✨</span>
+            <span className="font-semibold uppercase tracking-wider text-[11px]">
+              Gesture: {activeGesture.replace('_', ' ')}
             </span>
           </div>
         )}
       </div>
 
-      <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-xs text-slate-400 bg-slate-900/80 backdrop-blur-md px-3 py-2 rounded-lg border border-slate-800 pointer-events-none">
+      <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-xs text-neutral-600 bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-lg border border-neutral-200 shadow-xs pointer-events-none">
         <div className="flex items-center gap-2">
-          <span className="text-amber-400">🖐️ XR Hint:</span>
-          <span>Click any villager to trigger the <b>Pinch &amp; Lift</b> gesture inspect mode.</span>
+          <span className="text-amber-600 font-medium">🖐️ Pinch &amp; Lift:</span>
+          <span>Click any villager to inspect their live needs and thoughts.</span>
         </div>
-        <div className="text-[11px] text-slate-500 font-mono">
-          VR Scale: 0.8m Seated Lap Area
+        <div className="text-[11px] text-neutral-500 font-mono">
+          VR Scale: 0.8m Seated Tabletop
         </div>
       </div>
     </div>

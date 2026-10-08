@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { DIRECTORY_STRUCTURE_TREE } from '../data/projectSetupData';
-import { FolderTree, FileCode, CheckCircle, Copy, Check, Info, Box } from 'lucide-react';
+import { FolderTree, FileCode, Copy, Check, Box } from 'lucide-react';
 
 interface ScriptDetail {
   name: string;
@@ -65,7 +65,7 @@ namespace TabletopWeatherGod.Core
     name: 'WeatherManager.cs',
     folder: 'Assets/Scripts/Weather/',
     gameObjectTarget: 'GameObject named "[WeatherSystem]" under Tabletop Environment',
-    interfacesAndInheritance: 'MonoBehaviour, IWeatherService',
+    interfacesAndInheritance: 'MonoBehaviour',
     responsibility: 'FSM for Calm, Sun, Rain, Wind. Dispatches weather change events to island crops, well, and villager AI.',
     previewCode: `using UnityEngine;
 using System;
@@ -93,32 +93,24 @@ namespace TabletopWeatherGod.Weather
   'GodHandGestureManager.cs': {
     name: 'GodHandGestureManager.cs',
     folder: 'Assets/Scripts/Interaction/',
-    gameObjectTarget: 'Attached to OVRCameraRig > TrackingSpace > Hands root',
+    gameObjectTarget: 'Attached to [GestureManager] under [Core]',
     interfacesAndInheritance: 'MonoBehaviour',
-    responsibility: 'Listens to Meta XR Interaction SDK pose and velocity events to recognize the 5 hands-only god powers.',
+    responsibility: 'Listens to Meta XR OVRHand velocity and spatial vectors to recognize Sun, Rain, Wind, and Calm.',
     previewCode: `using UnityEngine;
-using Oculus.Interaction;
 using TabletopWeatherGod.Weather;
 
 namespace TabletopWeatherGod.Interaction
 {
     public class GodHandGestureManager : MonoBehaviour
     {
-        [Header("Detectors")]
-        [SerializeField] private ActiveStateSelector rubPalmsDetector;
-        [SerializeField] private ActiveStateSelector flickDownDetector;
-        [SerializeField] private ActiveStateSelector sweepWindDetector;
-        [SerializeField] private ActiveStateSelector calmPalmDetector;
+        [Header("Tracked Hand References")]
+        [SerializeField] private OVRHand leftHand;
+        [SerializeField] private OVRHand rightHand;
 
-        private void Start()
-        {
-            // Subscribe to Meta XR Interaction SDK pose active states
-        }
-
-        public void OnRubPalmsRecognized() => WeatherManager.Instance.SetWeather(WeatherType.Sunny);
-        public void OnFlickDownRecognized() => WeatherManager.Instance.SetWeather(WeatherType.Rainy);
-        public void OnSweepWindRecognized() => WeatherManager.Instance.SetWeather(WeatherType.Windy);
-        public void OnCalmPalmRecognized() => WeatherManager.Instance.SetWeather(WeatherType.Calm);
+        public void OnRubPalmsRecognized() => WeatherManager.Instance.TryChangeWeather(WeatherType.Sunny);
+        public void OnFlickDownRecognized() => WeatherManager.Instance.TryChangeWeather(WeatherType.Rainy);
+        public void OnSweepWindRecognized() => WeatherManager.Instance.TryChangeWeather(WeatherType.Windy);
+        public void OnCalmPalmRecognized() => WeatherManager.Instance.TryChangeWeather(WeatherType.Calm);
     }
 }`
   },
@@ -127,7 +119,7 @@ namespace TabletopWeatherGod.Interaction
     folder: 'Assets/Scripts/AI/',
     gameObjectTarget: 'Attached to each Villager Prefab alongside Villager.cs',
     interfacesAndInheritance: 'MonoBehaviour',
-    responsibility: 'Scores available actions (Drink, Farm, WarmUp, Pray, Panic) based on needs curves and environmental state.',
+    responsibility: 'Scores available actions (Drink, Farm, WarmUp, Pray, Wander) based on needs curves and environmental state.',
     previewCode: `using UnityEngine;
 using System.Collections.Generic;
 
@@ -145,7 +137,7 @@ namespace TabletopWeatherGod.AI
 
             foreach (var action in _availableActions)
             {
-                float score = action.CalculateScore();
+                float score = action.CalculateScore(_villager);
                 if (score > highestScore)
                 {
                     highestScore = score;
@@ -155,9 +147,9 @@ namespace TabletopWeatherGod.AI
 
             if (chosen != null && chosen != _currentBestAction)
             {
-                _currentBestAction?.OnCancel();
+                _currentBestAction?.OnExit(_villager, _motor);
                 _currentBestAction = chosen;
-                _currentBestAction.OnExecute();
+                _currentBestAction.OnEnter(_villager, _motor);
             }
         }
     }
@@ -168,7 +160,7 @@ namespace TabletopWeatherGod.AI
     folder: 'Assets/Scripts/Save/',
     gameObjectTarget: 'GameObject named "[SaveManager]" under Core Systems',
     interfacesAndInheritance: 'MonoBehaviour',
-    responsibility: 'Encodes and decodes IslandSaveData.json to Application.persistentDataPath with backup safety.',
+    responsibility: 'Encodes and decodes IslandSaveData.json to Application.persistentDataPath with atomic backup safety.',
     previewCode: `using UnityEngine;
 using System.IO;
 
@@ -212,26 +204,26 @@ export const ArchitectureViewer: React.FC = () => {
   return (
     <div className="h-full flex flex-col lg:flex-row gap-4 overflow-hidden">
       {/* Left Column: Directory Structure Explorer */}
-      <div className="w-full lg:w-80 flex flex-col bg-slate-900/80 border border-slate-800 rounded-xl overflow-hidden">
-        <div className="p-3.5 border-b border-slate-800 bg-slate-950/50 flex items-center gap-2">
-          <FolderTree className="w-4 h-4 text-cyan-400" />
-          <h3 className="text-xs font-semibold text-slate-200">
+      <div className="w-full lg:w-80 flex flex-col bg-white border border-neutral-200 rounded-xl overflow-hidden shadow-xs">
+        <div className="p-3.5 border-b border-neutral-200 bg-neutral-50 flex items-center gap-2">
+          <FolderTree className="w-4 h-4 text-neutral-600" />
+          <h3 className="text-xs font-semibold text-neutral-800">
             Assets/Scripts/ Architecture
           </h3>
         </div>
 
         <div className="flex-1 overflow-y-auto p-2 space-y-2">
           {DIRECTORY_STRUCTURE_TREE.map(folder => (
-            <div key={folder.path} className="p-2.5 rounded-lg bg-slate-950/70 border border-slate-800/80">
-              <div className="text-xs font-mono font-bold text-amber-300 flex items-center gap-1.5 mb-1">
+            <div key={folder.path} className="p-2.5 rounded-lg bg-neutral-50 border border-neutral-200/80">
+              <div className="text-xs font-mono font-bold text-neutral-800 flex items-center gap-1.5 mb-1">
                 <span>📁</span>
                 <span>{folder.path}</span>
               </div>
-              <p className="text-[11px] text-slate-400 mb-2 leading-relaxed">
+              <p className="text-[11px] text-neutral-600 mb-2 leading-relaxed">
                 {folder.purpose}
               </p>
 
-              <div className="space-y-1 pl-2 border-l border-slate-800">
+              <div className="space-y-1 pl-2 border-l border-neutral-300">
                 {folder.scripts.map(s => {
                   const isInteractive = Boolean(SAMPLE_SCRIPTS[s]);
                   const isSelected = selectedScriptKey === s;
@@ -242,10 +234,10 @@ export const ArchitectureViewer: React.FC = () => {
                       onClick={() => setSelectedScriptKey(s)}
                       className={`w-full text-left px-2 py-1 rounded text-xs font-mono flex items-center justify-between transition-colors ${
                         isSelected
-                          ? 'bg-indigo-600 text-white font-bold'
+                          ? 'bg-neutral-900 text-white font-bold'
                           : isInteractive
-                          ? 'text-cyan-300 hover:bg-slate-800/80'
-                          : 'text-slate-500 cursor-default'
+                          ? 'text-neutral-700 hover:bg-neutral-200/80'
+                          : 'text-neutral-400 cursor-default'
                       }`}
                     >
                       <div className="flex items-center gap-1.5">
@@ -253,7 +245,7 @@ export const ArchitectureViewer: React.FC = () => {
                         <span>{s}</span>
                       </div>
                       {isInteractive && (
-                        <span className="text-[9px] px-1 py-0.2 rounded bg-indigo-950/80 text-indigo-300">
+                        <span className="text-[9px] px-1 py-0.2 rounded bg-neutral-200 text-neutral-700">
                           Inspect
                         </span>
                       )}
@@ -267,46 +259,46 @@ export const ArchitectureViewer: React.FC = () => {
       </div>
 
       {/* Right Column: Script Details & Placement Target */}
-      <div className="flex-1 flex flex-col bg-slate-900/80 border border-slate-800 rounded-xl overflow-hidden p-4">
+      <div className="flex-1 flex flex-col bg-white border border-neutral-200 rounded-xl overflow-hidden p-4 shadow-xs">
         {selectedScript ? (
           <div className="flex-1 flex flex-col overflow-hidden">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 pb-3 border-b border-slate-800 mb-3">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 pb-3 border-b border-neutral-200 mb-3">
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-base font-bold text-white font-mono">{selectedScript.name}</span>
-                  <span className="px-2 py-0.5 rounded text-[11px] font-mono bg-slate-800 text-amber-300">
+                  <span className="text-base font-bold text-neutral-900 font-mono">{selectedScript.name}</span>
+                  <span className="px-2 py-0.5 rounded text-[11px] font-mono bg-neutral-100 text-neutral-700 border border-neutral-200">
                     {selectedScript.folder}
                   </span>
                 </div>
-                <div className="text-xs text-slate-400 mt-1 flex items-center gap-1.5">
-                  <Box className="w-3.5 h-3.5 text-cyan-400" />
+                <div className="text-xs text-neutral-600 mt-1 flex items-center gap-1.5">
+                  <Box className="w-3.5 h-3.5 text-neutral-500" />
                   <span>Target GameObject: </span>
-                  <b className="text-slate-200">{selectedScript.gameObjectTarget}</b>
+                  <b className="text-neutral-800">{selectedScript.gameObjectTarget}</b>
                 </div>
               </div>
 
               <button
                 onClick={handleCopy}
-                className="self-start md:self-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium transition-all"
+                className="self-start md:self-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-medium transition-all shadow-xs"
               >
                 {copiedCode ? <Check className="w-3.5 h-3.5 text-emerald-300" /> : <Copy className="w-3.5 h-3.5" />}
-                {copiedCode ? 'Copied to Clipboard' : 'Copy C# Code'}
+                {copiedCode ? 'Copied' : 'Copy C# Code'}
               </button>
             </div>
 
-            <div className="mb-3 p-3 rounded-lg bg-slate-950/90 border border-slate-800 text-xs">
-              <span className="text-slate-400 font-semibold">Responsibility: </span>
-              <span className="text-slate-300">{selectedScript.responsibility}</span>
+            <div className="mb-3 p-3 rounded-lg bg-neutral-50 border border-neutral-200 text-xs">
+              <span className="text-neutral-500 font-medium">Responsibility: </span>
+              <span className="text-neutral-800">{selectedScript.responsibility}</span>
             </div>
 
-            <div className="flex-1 overflow-y-auto rounded-lg bg-slate-950 border border-slate-800 p-3">
-              <pre className="text-xs font-mono text-emerald-300 leading-relaxed overflow-x-auto">
+            <div className="flex-1 overflow-y-auto rounded-lg bg-neutral-900 border border-neutral-800 p-3.5">
+              <pre className="text-xs font-mono text-emerald-400 leading-relaxed overflow-x-auto">
                 {selectedScript.previewCode}
               </pre>
             </div>
           </div>
         ) : (
-          <div className="flex-1 flex items-center justify-center text-slate-500 text-xs">
+          <div className="flex-1 flex items-center justify-center text-neutral-400 text-xs">
             Select a script from the explorer to view placement and code.
           </div>
         )}

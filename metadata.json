@@ -1,0 +1,6 @@
+{
+  "name": "Tabletop Weather God - XR Dev Studio & Simulator",
+  "description": "Interactive developer workbench and prototype simulator for Tabletop Weather God, a Meta Quest VR hands-only god game with utility AI villagers.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
